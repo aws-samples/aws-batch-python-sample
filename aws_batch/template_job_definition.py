@@ -1,6 +1,8 @@
 def get_job_definition(account, region, container_name, job_def_name, job_param_s3uri_destination, memoryInMB, ncpus,
                        role_name):
     """
+    YOU WOULD CUSTOMISE THIS BASED ON YOUR ACCESS REQUIREMENTS
+
 This is the job definition for this sample job.
     :param account:
     :param region:

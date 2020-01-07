@@ -3,7 +3,9 @@ from urllib.parse import urlparse
 
 def create_access_policy(s3_bucket_uri):
     """
-This is the policy required to run this sample job
+YOU WOULD CUSTOMISE THIS BASED ON YOUR ACCESS REQUIREMENTS
+
+This is the policy required to run this sample job.
     :param s3_bucket_uri: The s3 bucket path to put the results to
     :return: The access policy json
     """
