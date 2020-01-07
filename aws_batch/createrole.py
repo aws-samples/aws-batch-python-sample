@@ -11,7 +11,6 @@ def create_role(role_name, assumed_role_policy, policy, managed_policy_arns=None
     logger.info(
         "Creating role {} with accesspolicy \n {}".format(role_name, json.dumps(policy, sort_keys=False, indent=4)))
 
-    # TODO: Fix this update role later
     try:
         client.create_role(
 
