@@ -21,7 +21,7 @@ def create_role(role_name, assumed_role_policy, policy, managed_policy_arns=None
         )
     except Exception as e:
         logger.warning(
-            "Error creating role {}, {}, the role could not be create. If the role already exists, then the managed policy and custom policy will be added to it..".format(
+            "Error creating role {}, {}, the role could not be created. If the role already exists, then the managed policy and custom policy will be added to it..".format(
                 role_name, e))
 
     # Managed policy arn here
