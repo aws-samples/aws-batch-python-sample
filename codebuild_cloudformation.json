@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "Deploys code pipeline to build recommendation",
+  "Description": "Deploys code pipeline to build aws batch",
   "Metadata": {},
   "Parameters": {
     "codeBuildProjectName": {
@@ -47,7 +47,7 @@
           },
           "Type": "S3"
         },
-        "Description": "Builds Recommendation engine",
+        "Description": "Builds aws batch docker image",
         "Environment": {
           "Type": "LINUX_CONTAINER",
           "ComputeType": "BUILD_GENERAL1_SMALL",
