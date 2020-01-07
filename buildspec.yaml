@@ -1,0 +1,60 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - apt-get update
+      - apt-get install zip
+  pre_build:
+    commands:
+      - pip install pytest==3.6.3
+      - pip install pyflakes==2.0.0
+   ## CONFIGURE THIS: Repo name, please make sure this repo exists in ECR
+      - export IMAGE_REPO_NAME=aws-batch-sample-python
+      # AWS cli version to login into ecr. This needs to be compatible with the version of boto3 in the requirements file
+      - export awscli_version=1.16.35
+
+  build:
+    commands:
+      # Run Tests
+      - pip install -r source/requirements.txt
+      - pip install -r tests/requirements.txt
+      - pyflakes ./**/*.py
+      - export PYTHONPATH=./source
+      - pytest
+      ## Tests passed, so build docker
+      - echo Building the Docker image...
+      - cd source
+
+      ## Automate version tagging based on datetime for now, ideally should be tied to release tags
+      - export LATEST_TAG=latest
+      - export VERSION_TAG=$(date '+%Y%m%d%H%M')
+      # Get AWS Account Id
+      - export AWS_ACCOUNT_ID=$(echo $CODEBUILD_BUILD_ARN | cut -d':' -f 5)
+      # Build docker image
+      - docker build -t $IMAGE_REPO_NAME:$LATEST_TAG .
+      - docker tag $IMAGE_REPO_NAME:$LATEST_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$LATEST_TAG
+      - docker tag $IMAGE_REPO_NAME:$LATEST_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$VERSION_TAG
+
+  post_build:
+    commands:
+      - echo creating package
+      - echo $CODEBUILD_SRC_DIR
+    ## This is optional, packaging the solution without docker
+      - mkdir $CODEBUILD_SRC_DIR/buildoutput
+      - pip install -r  $CODEBUILD_SRC_DIR/source/requirements.txt  -t  $CODEBUILD_SRC_DIR/source
+      - cd $CODEBUILD_SRC_DIR/source && zip -r ../buildoutput/source.zip .
+    # Login to to ECR, this means code build has this role
+    # fix awscli version so nothing breaks...
+      - pip install awscli==$awscli_version
+      - echo Logging in to Amazon ECR...
+      - $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
+     #Push Docker Image
+      - echo Pushing the Docker image...
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$LATEST_TAG
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$VERSION_TAG
+
+artifacts:
+  files:
+    - '**/*'
+  base-directory: buildoutput
