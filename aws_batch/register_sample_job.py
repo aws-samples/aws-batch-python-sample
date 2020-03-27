@@ -56,8 +56,8 @@ class RegisterJob:
 
         logger.info(
             "Creating a job with parameters \n {}".format(json.dumps(job_definition, sort_keys=False, indent=4)))
-        reponse = self.client.register_job_definition(**job_definition)
-        return reponse
+        response = self.client.register_job_definition(**job_definition)
+        return response
 
 
 if __name__ == '__main__':
